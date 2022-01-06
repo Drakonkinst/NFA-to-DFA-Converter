@@ -60,7 +60,7 @@ public class FSA {
         return new FSA(newStates, newAlphabet, newInitialState, newAcceptStates, newTransitions, true);
     }
 
-    // If input is sorted, then all state names in the output are also sorted
+    // Computes the power set of a given set of states.
     private List<State> computePowerSet(List<State> states) {
         List<State> subsets = new ArrayList<>();
         List<State> powerSet = new ArrayList<>();
