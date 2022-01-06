@@ -1,5 +1,14 @@
 import java.util.*;
 
+/**
+ * State class that represents a state consisting of one or more names.
+ * States in the original NFA usually have a single name, when
+ * constructing the DFA we may need states that encompass multiple states from
+ * the NFA so multiple names are used.
+ * 
+ * States are cached to ensure that objects are re-used when possible.
+ * The empty state is a special constant object.
+ */
 public class State implements Comparable<State> {
     public static final State EMPTY = new State();
     private static final String EMPTY_NAME = "EM";
@@ -29,12 +38,13 @@ public class State implements Comparable<State> {
         return of(set);
     }
 
-    // Creates the display name of the State
+    // Creates the display name of the State. Display name is calculated
+    // once and stored since it is a non-trivial operation.
     private static String constructDisplayName(Set<String> names) {
         List<String> nameList = new ArrayList<>(names);
         return '{' + String.join(", ", nameList) + '}';
     }
-
+    
     private final Set<String> names;
     private final String displayName;
 
@@ -58,10 +68,6 @@ public class State implements Comparable<State> {
         return names;
     }
 
-    public String getDisplayName() {
-        return displayName;
-    }
-
     @Override
     public String toString() {
         return displayName;
@@ -72,7 +78,7 @@ public class State implements Comparable<State> {
     public int compareTo(State o) {
         int sizeDiff = names.size() - o.getNames().size();
         if(sizeDiff == 0) {
-            return displayName.compareTo(o.getDisplayName());
+            return toString().compareTo(o.toString());
         }
         return sizeDiff;
     }

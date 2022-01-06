@@ -1,4 +1,3 @@
-import java.io.BufferedReader;
 import java.io.*;
 import java.util.*;
 
@@ -85,37 +84,67 @@ public class Main {
     
     // Output
     private static void writeOutputFromDFA(FSA dfa) {
-        
-    }
-    
-    // not sure if this will be used yet
-    private static void writeOutputFile(List<String> lines) {
         try {
             PrintWriter writer = new PrintWriter("output.DFA");
-            for(String line : lines) {
-                writer.println(line);
+            writer.println(statesToString(dfa.getStates()));
+            writer.println(alphabetToString(dfa.getAlphabet()));
+            writer.println(dfa.getInitialState().toString());
+            writer.println(statesToString(dfa.getAcceptStates()));
+
+            List<Transition> transitions = dfa.getTransitions();
+            for(Transition transition : transitions) {
+                writer.println(transition.toString());
             }
+            
             writer.close();
-        } catch(IOException e) {
+        } catch (IOException e) {
             System.out.println("Error while writing output.");
             e.printStackTrace();
         }
     }
     
+    // not sure if this will be used yet
+    private static String statesToString(Collection<State> states) {
+        Iterator<State> stateIterator = states.iterator();
+        String result = "";
+
+        while(stateIterator.hasNext()) {
+            result += stateIterator.next() + "\t";
+        }
+        
+        // Remove last character
+        if(result.length() > 0) {
+            result = result.substring(0, result.length() - 1);
+        }
+        return result;
+    }
+    
+    private static String alphabetToString(String[] alphabet) {
+        String result = "";
+        for(String symbol : alphabet) {
+            result += symbol + "\t";
+        }
+        
+        if(result.length() > 0) {
+            result = result.substring(0, result.length() - 1);
+        }
+        return result;
+    }
+    
+    // Main
     public static void main(String[] args) {
         if(args.length < 1) {
             throw new IllegalArgumentException("Input path must be specified!");
         }
         
-        
         FSA nfa = readNFAFromInput(args[0]);
         System.out.println("=== NFA ===");
         nfa.print();
         System.out.println();
+        
         FSA dfa = nfa.convertToDFA();
         System.out.println("=== DFA ===");
         dfa.print();
-        System.out.println();
-        writeOutputFromDFA(nfa.convertToDFA());
+        writeOutputFromDFA(dfa);
     }
 }

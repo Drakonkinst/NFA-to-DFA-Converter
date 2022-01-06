@@ -65,10 +65,13 @@ public class FSA {
         List<State> subsets = new ArrayList<>();
         List<State> powerSet = new ArrayList<>();
         powerSet.add(State.EMPTY); // Power set always contains the empty set
+        
         // Each index of the exists array represents
         // whether the state at that index exists.
         boolean[] exists = new boolean[states.size()];
-        // Equivalent to 2 ^ states.size() - 1
+        
+        // Equivalent to 2 ^ states.size() - 1. The power set is of size 2^n,
+        // but we add the empty state automatically so subtract one.
         int numIterations = (1 << states.size()) - 1;
 
         // Iterate through all possible permutations of the exists array
@@ -76,6 +79,7 @@ public class FSA {
             addOne(exists);
             Set<String> subset = new HashSet<>();
 
+            // Collect all unique names from all states that exist in this permutation
             for(int j = 0; j < exists.length; ++j) {
                 if(exists[j]) {
                     subset.addAll(states.get(j).getNames());
@@ -183,46 +187,71 @@ public class FSA {
 
         return transitionList;
     }
+    
+    // Computes the list of accept states from the given list of transitions
+    private Set<State> computeAcceptStates(List<Transition> newTransitions) {
+        // Collect all names of accept states
+        Set<String> acceptStateNames = mergeStates(acceptStates).getNames();
+        Set<State> newAcceptStates = new HashSet<>();
 
-    // Helpers
+        // Check both start and end states for an accept state
+        for(Transition transition : newTransitions) {
+            // Check start state
+            State start = transition.getStart();
+            if(!newAcceptStates.contains(start)) {
+                for(String s : start.getNames()) {
+                    if(acceptStateNames.contains(s)) {
+                        newAcceptStates.add(start);
+                    }
+                }
+            }
 
-    private State mergeStates(Collection<State> states) {
+            // Check end state
+            State end = transition.getEnd();
+            if(!newAcceptStates.contains(end)) {
+                for(String s : end.getNames()) {
+                    if(acceptStateNames.contains(s)) {
+                        newAcceptStates.add(end);
+                    }
+                }
+            }
+        }
+
+        return newAcceptStates;
+    }
+    
+    // Helper method to merge a set of states into a single state,
+    // ensuring names are unique
+    private State mergeStates(Set<State> states) {
         if(states.size() == 1) {
             return states.iterator().next();
         }
 
+        // Collect all unique names
         Set<String> stateNames = new HashSet<>();
         for(State state : states) {
             stateNames.addAll(state.getNames());
         }
         return State.of(stateNames);
     }
-
-    private Set<State> computeAcceptStates(List<Transition> newTransitions) {
-        Set<String> acceptStateNames = mergeStates(acceptStates).getNames();
-        Set<State> newAcceptStates = new HashSet<>();
-
-        for(Transition transition : newTransitions) {
-            State start = transition.getStart();
-            State end = transition.getEnd();
-            
-            if(!newAcceptStates.contains(start)) {
-                for(String s : start.getNames()) {
-                    if(acceptStateNames.contains(s)) {
-                        newAcceptStates.add(start);
-                    }
-                }   
-            }
-            
-            if(!newAcceptStates.contains(end)) {
-                for(String s : end.getNames()) {
-                    if(acceptStateNames.contains(s)) {
-                        newAcceptStates.add(end);
-                    }
-                }   
-            }
-        }
-
-        return newAcceptStates;
+    
+    public List<State> getStates() {
+        return states;
+    }
+    
+    public String[] getAlphabet() {
+        return alphabet;
+    }
+    
+    public State getInitialState() {
+        return initialState;
+    }
+    
+    public Set<State> getAcceptStates() {
+        return acceptStates;
+    }
+    
+    public List<Transition> getTransitions() {
+        return transitions;
     }
 }

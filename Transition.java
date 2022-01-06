@@ -1,3 +1,7 @@
+/**
+ * Transition class that represents a transition between two states, with
+ * a single symbol input. Epsilon is represented as EPS.
+ */
 public class Transition {
     public static final String EPSILON = "EPS";
 
@@ -11,6 +15,7 @@ public class Transition {
         this.end = end;
     }
 
+    // Returns true if the start state and input symbol match
     public boolean matches(State from, String input) {
         return from.equals(start) && input.equals(symbol);
     }
