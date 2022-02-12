@@ -11,7 +11,7 @@ import java.util.*;
  */
 public class State implements Comparable<State> {
     public static final State EMPTY = new State();
-    private static final String EMPTY_NAME = "EM";
+    private static final String EMPTY_NAME = "{EM}";
     private static final Map<Set<String>, State> cache = new HashMap<>();
 
     // Static constructor that re-uses State objects if they have a re-used name
